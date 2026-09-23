@@ -475,10 +475,15 @@
 
         /* ========== SCROLL ANIMATIONS ========== */
         .reveal {
-            opacity: 0; transform: translateY(40px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
+            opacity: 1; transform: translateY(0);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .js-reveal .reveal:not(.visible) {
+            opacity: 0; transform: translateY(30px);
+        }
+        .js-reveal .reveal.visible {
+            opacity: 1; transform: translateY(0);
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -912,7 +917,8 @@ function applyTheme(theme) {
         if (btn) btn.textContent = '🌙';
     }
     // Redraw chart if already rendered to update theme colors
-    if (typeof drawChart === 'function' && chartCanvas) {
+    const canvasEl = document.getElementById('revenueChart');
+    if (typeof drawChart === 'function' && canvasEl && typeof chartProgress !== 'undefined' && chartProgress > 0) {
         drawChart();
     }
 }
@@ -1286,13 +1292,14 @@ if (track && cards.length > 0) {
 }
 
 // ==================== SCROLL REVEAL ====================
+document.documentElement.classList.add('js-reveal');
 const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(e => {
         if (e.isIntersecting) {
             e.target.classList.add('visible');
         }
     });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
 // ==================== MOBILE MENU ====================
