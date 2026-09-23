@@ -1,61 +1,36 @@
-# 📊 DataPulse AI — Enterprise E-Commerce Analytics
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-[![Deploy to GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-2ea44f?style=flat&logo=github)](https://olyxmintabansos-byte.github.io/datapulse-ai/)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-blue?style=flat)]()
-[![License](https://img.shields.io/badge/License-MIT-purple?style=flat)]()
-[![Platform](https://img.shields.io/badge/Platform-Client--Side%20Local--First-orange?style=flat)]()
+## Getting Started
 
-> **Live Production Demo**: [https://olyxmintabansos-byte.github.io/datapulse-ai/](https://olyxmintabansos-byte.github.io/datapulse-ai/)
-
----
-
-## ⚡ Overview
-
-**DataPulse AI** adalah platform analitik e-commerce berbasis kecerdasan buatan (*predictive analytics*) untuk mengoptimalkan omset, mencegah kerugian akibat *deadstock*, memprediksi *customer churn*, dan menerapkan dynamic pricing otomatis.
-
-Aplikasi ini dibangun dengan paradigma **Zero-Dependency High-Performance Client-Side**, memanfaatkan rendering Canvas 2D terakselerasi hardware, tema adaptif Dark/Light mode tersinkronisasi `localStorage`, dan simulasi ROI real-time.
-
----
-
-## ✨ Fitur Utama
-
-- 🌌 **Reactive Particle Mesh Engine**: Latar belakang partikel Canvas interaktif dengan deteksi kursor mouse (gaya tolak repulsi + garis dinamis), adaptif terhadap Retina / HiDPI display.
-- 📈 **Dynamic Live Revenue Chart**: Visualisasi bar chart animasi pada canvas 2D yang responsif dan sinkron dengan tema aktif (Dark / Light mode).
-- 🧮 **Interactive 3-Slider ROI Calculator**: Kalkulasi estimasi penghematan deadstock, efisiensi margin harga, dan retensi pelanggan secara real-time.
-- 🌓 **Persistent Theme Engine**: Toggle Dark / Light mode dengan penyimpanan otomatis ke `localStorage` dan auto-detect preferensi sistem (`prefers-color-scheme`).
-- 💬 **Testimonial Carousel**: Slider otomatis dengan kontrol dot dinamis, swipe/pause on hover, dan auto-realign saat resize window.
-- 📱 **Fully Responsive UI (320px – 2560px)**: Tampilan mobile-first dengan hamburger drawer menu yang mulus.
-- 🛡️ **Zero QuerySelector DOM Crashes**: Pengamanan routing navigasi anchor dan bypass Jekyll (`.nojekyll`) untuk deployment GitHub Pages.
-
----
-
-## 🛠️ Tech Stack & Architecture
-
-- **Core**: Semantic HTML5, CSS3 Modern (Custom Variables, Flexbox, CSS Grid, Glassmorphism Backdrop Filter).
-- **Scripting**: Pure Vanilla JavaScript (Zero External NPM Runtime Dependencies).
-- **Graphics**: HTML5 Canvas 2D Context API (`requestAnimationFrame`, DPR scaling).
-- **Hosting**: GitHub Pages Static Hosting via root `/` with `.nojekyll`.
-
----
-
-## 🚀 Menjalankan Secara Lokal
-
-Cukup clone repository dan buka `index.html` langsung di browser favorit Anda:
+First, run the development server:
 
 ```bash
-git clone https://github.com/olyxmintabansos-byte/datapulse-ai.git
-cd datapulse-ai
-# Buka di Windows
-start index.html
-# Buka di macOS
-open index.html
-# Buka di Linux
-xdg-open index.html
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 👤 Author & Maintainer
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-* **Developer:** [olyxmintabansos-byte](https://github.com/olyxmintabansos-byte)
-* **Portfolio Launcher:** [Olyx Project Portal](https://olyxmintabansos-byte.github.io/olyx-project-hub/)
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
