@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import "./globals.css";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { StoreProvider } from "@/context/StoreContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,8 +45,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-full flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
         <ThemeProvider>
-          {children}
-          <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+          <StoreProvider>
+            {children}
+            <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>

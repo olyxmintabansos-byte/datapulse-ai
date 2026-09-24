@@ -10,12 +10,16 @@ import {
   UserCheck,
   UserX,
   UserPlus,
-  CheckCircle2
+  CheckCircle2,
+  MessageCircle,
+  Copy
 } from 'lucide-react';
-import { storePresets, formatRupiah, Customer } from '@/lib/data';
+import { formatRupiah, Customer } from '@/lib/data';
+import { useStore } from '@/context/StoreContext';
 
 export default function CustomerRadarPage() {
-  const [customers, setCustomers] = useState<Customer[]>(storePresets[0].customers);
+  const { customers, currentStore, sendWinbackVoucher, triggerCelebration } = useStore();
+
   const [selectedSegment, setSelectedSegment] = useState<string>('all');
   const [campaignModalOpen, setCampaignModalOpen] = useState<boolean>(false);
   const [targetSegment, setTargetSegment] = useState<string>('at-risk');
@@ -33,11 +37,24 @@ export default function CustomerRadarPage() {
   };
 
   const handleLaunchCampaign = () => {
-    const targetCount = customers.filter(c => c.segment === targetSegment).length;
+    const targetCustomers = customers.filter(c => c.segment === targetSegment);
+    const voucherCode = `WINBACK${voucherDiscount}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
     showNotification(
-      `Kampanye Win-Back berhasil dikirim! ${targetCount} pelanggan di segmen [${targetSegment.toUpperCase()}] telah menerima email voucher diskon ${voucherDiscount}%.`
+      `Kampanye Win-Back Berhasil! Kupon [${voucherCode}] diskon ${voucherDiscount}% siap dikirim ke ${targetCustomers.length} pelanggan ${targetSegment.toUpperCase()}.`
     );
+    triggerCelebration();
     setCampaignModalOpen(false);
+  };
+
+  const handleDirectSend = (customer: Customer, channel: 'whatsapp' | 'email' | 'copy') => {
+    const voucherCode = `VIP${customer.name.substring(0, 3).toUpperCase()}15`;
+    sendWinbackVoucher(customer, voucherCode, 15, channel);
+    if (channel === 'copy') {
+      showNotification(`Pesan voucher untuk ${customer.name} disalin ke clipboard!`);
+    } else {
+      showNotification(`Membuka ${channel === 'whatsapp' ? 'WhatsApp' : 'Email'} untuk ${customer.name}...`);
+    }
   };
 
   return (
@@ -53,15 +70,20 @@ export default function CustomerRadarPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Customer Churn Radar & RFM Quadrant</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">Customer Churn Radar & RFM Quadrant</h1>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+              {currentStore.name}
+            </span>
+          </div>
           <p className="text-sm text-slate-500">
-            Analisis segmentasi Recency, Frequency, & Monetary (RFM) untuk cegah churn dan tingkatkan retensi.
+            Analisis segmentasi Recency, Frequency, & Monetary (RFM) dengan integrasi langsung WhatsApp & Email win-back.
           </p>
         </div>
 
         <button
           onClick={() => setCampaignModalOpen(true)}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/20 transition-all"
+          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
         >
           <Send className="w-4 h-4" /> Jalankan Kampanye Win-Back AI
         </button>
@@ -116,7 +138,7 @@ export default function CustomerRadarPage() {
           {selectedSegment !== 'all' && (
             <button
               onClick={() => setSelectedSegment('all')}
-              className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+              className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
             >
               Reset Filter Segmen
             </button>
@@ -128,12 +150,13 @@ export default function CustomerRadarPage() {
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-6">Nama Pelanggan</th>
-                <th className="py-3 px-6">Email</th>
+                <th className="py-3 px-6">Kontak / Email</th>
                 <th className="py-3 px-6 text-right">Total Transaksi</th>
                 <th className="py-3 px-6 text-right">Total Belanja</th>
-                <th className="py-3 px-6 text-right">Rata-Rata Keranjang</th>
+                <th className="py-3 px-6 text-right">AOV</th>
                 <th className="py-3 px-6 text-center">Inaktif Sejak</th>
                 <th className="py-3 px-6 text-center">Segmen RFM</th>
+                <th className="py-3 px-6 text-center">Aksi Cepat</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -159,6 +182,31 @@ export default function CustomerRadarPage() {
                     }`}>
                       {c.segment.toUpperCase()}
                     </span>
+                  </td>
+                  <td className="py-4 px-6 text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => handleDirectSend(c, 'whatsapp')}
+                        className="p-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors cursor-pointer"
+                        title="Kirim Voucher via WhatsApp"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDirectSend(c, 'email')}
+                        className="p-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors cursor-pointer"
+                        title="Kirim Voucher via Email"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDirectSend(c, 'copy')}
+                        className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg transition-colors cursor-pointer"
+                        title="Salin Pesan Kupon"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -190,7 +238,7 @@ export default function CustomerRadarPage() {
                 <select
                   value={targetSegment}
                   onChange={e => setTargetSegment(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold text-xs"
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold text-xs cursor-pointer"
                 >
                   <option value="at-risk">At Risk (Potensi Churn)</option>
                   <option value="lost">Lost / Churned (Inaktif &gt; 90 Hari)</option>
@@ -200,7 +248,7 @@ export default function CustomerRadarPage() {
 
               <div>
                 <label className="block font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Nilai Diskon Voucher Email
+                  Nilai Diskon Voucher Email / WA
                 </label>
                 <div className="flex items-center gap-2">
                   {[10, 15, 20, 25].map(v => (
@@ -208,7 +256,7 @@ export default function CustomerRadarPage() {
                       key={v}
                       type="button"
                       onClick={() => setVoucherDiscount(v)}
-                      className={`flex-1 py-2 rounded-lg font-bold transition-colors ${
+                      className={`flex-1 py-2 rounded-lg font-bold transition-colors cursor-pointer ${
                         voucherDiscount === v
                           ? 'bg-indigo-600 text-white'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -224,13 +272,13 @@ export default function CustomerRadarPage() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setCampaignModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+                className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={handleLaunchCampaign}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-500/20"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-500/20 cursor-pointer"
               >
                 Kirim Kampanye Sekarang
               </button>
@@ -246,7 +294,7 @@ function SegmentCard({ title, count, icon, active, onClick }: { title: string; c
   return (
     <button
       onClick={onClick}
-      className={`p-4 rounded-xl border text-left transition-all ${
+      className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
         active
           ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500 shadow-sm'
           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
